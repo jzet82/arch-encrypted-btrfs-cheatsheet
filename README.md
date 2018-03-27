@@ -1,5 +1,7 @@
 # Install Arch Linux on an Encrypted Btrfs Partition
 
+**This guide is not suitable for uefi mode**
+
 **Keyboard layout**
 ```bash
 loadkeys pl
@@ -16,7 +18,7 @@ badblocks -c 10240 -s -w -t random -v /dev/sda
 ```
 
 **Create two partitions**
-```bash
+```
 /dev/sda1 200M for /boot
 /dev/sda2 the remaining space for the system
 ```
@@ -82,7 +84,10 @@ arch-chroot /mnt
 ```
 
 **Create boot image**
-Modify /etc/mkinitcpio.conf by adding `encrypt` before filesystems inside the HOOKS section
+
+`
+Modify /etc/mkinitcpio.conf by adding encrypt before filesystems inside the HOOKS section and run
+`
 ```bash
 mkinitcpio -p linux
 ```
@@ -93,8 +98,12 @@ ln -sf /usr/share/zoneinfo/Europe/Warsaw /etc/localtime
 ```
 
 **Generate the required locales**
+
+`
+Uncomment the en_US.UTF-8 and pl_PL.UTF-8 languages in /etc/locale.gen and run
+`
 ```bash
-Uncomment the en_US.UTF-8 and pl_PL.UTF-8 languages in /etc/locale.gen and run locale-gen
+locale-gen
 ```
 
 **In /etc/locale.conf, write**
@@ -109,7 +118,7 @@ hwclock --systohc --utc
 ```
 
 **Set the desired hostname**
-```bash
+```
 echo Arch Desktop > /etc/hostname
 ```
 
@@ -121,6 +130,11 @@ passwd
 **Install Grub**
 ```bash
 pacman -Sy grub
+```
+
+**Install few other important packages**
+```bash
+pacman -Sy linux-headers wpa_supplicant wireless_tools
 ```
 
 **Add the following kernel parameter to be able to unlock your LUKS encrypted root partition during system startup in `/etc/default/grub`**
@@ -135,7 +149,7 @@ grub-mkconfig --output /boot/grub/grub.cfg
 ```
 
 **Exit from chroot, unmount the partitions, close the device and reboot**
-```bash
+```
 exit
 umount -R /mnt/boot
 umount -R /mnt
